@@ -16,7 +16,7 @@
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function(searchElement /*, fromIndex */ ) {
         "use strict";
-        if (this === null) {
+        if (this == null) {
             throw new TypeError();
         }
         var t = Object(this);
@@ -78,49 +78,6 @@ if (!Array.prototype.indexOf) {
         return this.bind(type, data, cb);
     };
 })(jQuery);
-
-    /*
- *  Add extension to jQuery with a function to get URL parameters. Modified to accomodate non-latin characters.
- *  The function will work if the passed parameter is either of type String or is of type Object (JSON object).
-    Hemed, 18-11-2014.
- */
-  jQuery.extend({
-    getUrlVars: function() {
-        var params = new Object;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-
-         for( var i = 0; i < hashes.length; i++ ) 
-            {   
-                hash = hashes[i].split('=');
-                if ( hash.length > 1 ) {
-                    if (hash[1].replace(/%22/gi,"")[0] === "[" || hash[1].replace(/%22/gi,"")[0] === "{" ) 
-                    {
-                        hash[1] = hash[1].replace(/^%22/,"").replace(/%22$/,"");
-                        
-                         var temp = hash[1];  //This is the query object as displayed in the browser.
-                         var newval = JSON.parse(decodeURIComponent(temp)); //decode that string and then parse it as JSON object.
-                    } 
-                    else 
-                     {
-                        var newval = (hash[1].replace(/%22/gi,'"'));
-                     }
-                    
-                     if(typeof(newval) === 'object') //if newval is of type JSON object, then return the parsed object.
-                     {
-                        params[hash[0]] = newval;
-                     }
-                     else if(typeof(newval) === 'string') //if the passed varibale is a string, then simply decode it..
-                     {
-                        params[hash[0]] = decodeURIComponent(newval);
-                     }
-                }
-              }
-         return params;
-       },
-          getUrlVar: function(name){
-               return jQuery.getUrlVars()[name];
-      }
-   });
 
 function safeId(s) {
     return s.replace(/\./gi,'_').replace(/\:/gi,'_')
@@ -302,7 +259,7 @@ function getUrlVars() {
             // field on which to focus the freetext search
             "searchfield" : "", // e.g. title.exact
             
-            //freetext search string
+            // freetext search string
             "q" : "",
             
             ///// facet aspects /////////////////////////////
@@ -318,7 +275,7 @@ function getUrlVars() {
                 "hidden" : true|false                                               // whether the facet should be displayed at all (e.g. you may just want the data for a callback)
                 "disabled" : true|false                                             // whether the facet should be acted upon in any way.  This might be useful if you want to enable/disable facets under different circumstances via a callback
                 
-                //terms facet only
+                // terms facet only
                 
                 "size" : <num>,                                                     // how many terms should the facet limit to
                 "logic" : "AND|OR",                                                 // Whether to AND or OR selected facets together when filtering
@@ -400,7 +357,7 @@ function getUrlVars() {
             "sharesave_link" : true,
 
             // provide a function which will do url shortening for the sharesave_link box
-            "url_shortener" : true,
+            "url_shortener" : false,
             
             // on free-text search, default operator for the elasticsearch query system to use
             "default_operator" : "OR",
@@ -416,12 +373,12 @@ function getUrlVars() {
             // FIXME: should we read in facets from urls, and if we do, what should we do about them?
             // should facets be included in shareable urls.  Turning this on makes them very long, and currently
             // facetview does not read those facets back in if the URLs are parsed
-            "include_facets_in_url" : true,
+            "include_facets_in_url" : false,
             
             // FIXME: should we read in fields from urls, and if we do, what should we do about them?
             // should fields be included in shareable urls.  Turning this on makes them very long, and currently
             // facetview does not read those fields back in if the URLs are parsed
-            "include_fields_in_url" : true,
+            "include_fields_in_url" : false,
             
             ///// selected filters /////////////////////////////
             
@@ -498,7 +455,7 @@ function getUrlVars() {
             // render the date histogram facet
             "render_date_histogram_facet" : renderDateHistogramFacet,
             "render_date_histogram_values" : renderDateHistogramValues,
-            "render_date_histogram_result" : renderUBBDateHistogramResult,
+            "render_date_histogram_result" : renderDateHistogramResult,
             
             // render any searching notification (which will then be shown/hidden as needed)
             "render_searching_notification" : searchingNotification,
@@ -622,22 +579,18 @@ function getUrlVars() {
             ie8compat(defaults);
             
             // extend the defaults with the provided options
-            //var provided_options = $.extend(defaults, options);
+            var provided_options = $.extend(defaults, options);
             
             // deal with the options that come from the url, which require some special treatment
-            /**var url_params = getUrlVars();
-            //var url_options = {};
+            var url_params = getUrlVars();
+            var url_options = {};
             if ("source" in url_params) {
                 url_options = optionsFromQuery(url_params["source"])
             }
             if ("url_fragment_identifier" in url_params) {
                 url_options["url_fragment_identifier"] = url_params["url_fragment_identifier"]
-            }**/
-            
-           var provided_options = $.extend(defaults, options);
-           var url_options = $.getUrlVars();
-           provided_options = $.extend(provided_options, url_options);
-            
+            }
+            provided_options = $.extend(provided_options, url_options);
             
             // copy the _selected_operators data into the relevant facets
             // for each pre-selected operator, find the related facet and set its "logic" property
@@ -725,15 +678,14 @@ function getUrlVars() {
             
             // set the search order
             // NOTE: that this interface only supports single field ordering
-            var sorting = options.sort;
+            sorting = options.sort;
 
-            for (var i = 0; i < sorting.length; i++) {
+            for (var i=0; i < sorting.length; i=i+1) {
                 var so = sorting[i];
-                var fields = Object.keys(so);
-                for (var j = 0; j < fields.length; j++) {
-                    var dir = so[fields[j]]["order"];
+                for (var field=0; field < so.length; field=field+1) {
+                    var dir = so[field]["order"];
                     options.behaviour_set_order(options, obj, {order: dir});
-                    options.behaviour_set_order_by(options, obj, {orderby: fields[j]});
+                    options.behaviour_set_order_by(options, obj, {orderby: field});
                     break
                 }
                 break
@@ -881,18 +833,16 @@ function getUrlVars() {
         function keyupSearchText(event) {
             event.preventDefault();
             var q = $(this).val();
-            //options.from = 0;
             options.q = q;
-            doSearch();
+            doSearch()
         }
         
         // click of the search button
         function clickSearch() {
             event.preventDefault();
             var q = $(".facetview_freetext", obj).val();
-            //options.from = 0;
             options.q = q;
-            doSearch();
+            doSearch()
         }
 
         /////// share save link /////////////////////////////////
@@ -1444,7 +1394,6 @@ function getUrlVars() {
             // remove from the active filters any whose facets are disabled
             // (this may have happened during the pre-search callback, for example)
             pruneActiveFilters();
-              
 
             // make the search query
             var queryobj = elasticSearchQuery({"options" : options});

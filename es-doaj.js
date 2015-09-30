@@ -56,6 +56,7 @@ function optionsFromQuery(query) {
 
     // from position
     if (query.hasOwnProperty("from")) { opts["from"] = query.from }
+    
     // page size
     if (query.size) { opts["page_size"] = query.size }
     
@@ -124,8 +125,8 @@ function optionsFromQuery(query) {
                 if (field) {
                     var rparams = r[field];
                     var range = {};
-                    if ("lt" in rparams) { range["to"] = '2015-01-01' ; /**rparams.lt**/ }
-                    if ("gte" in rparams) { range["from"] = '2013-01-01';/**rparams.gte**/ }
+                    if ("lt" in rparams) { range["to"] = rparams.lt }
+                    if ("gte" in rparams) { range["from"] = rparams.gte }
                     opts["_active_filters"][field] = range;
                 }
             }
@@ -278,12 +279,6 @@ function elasticSearchQuery(params) {
 
     // search string and search field produce a query_string query element
     var querystring = options.q;
-    
-    //We want to remove plus sign here
-    if(querystring!==""){
-        querystring = querystring.split("+").join(" ");
-        //alert(querystring);
-    }
     var searchfield = options.searchfield;
     var default_operator = options.default_operator;
     var ftq = undefined;

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>FacetView</title>
+
+  <script type="text/javascript" src="vendor/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>  
+
+  <link rel="stylesheet" href="vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css">
+  <script type="text/javascript" src="vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js"></script>
+
+  <!-- note that we require the es.js integration, the bootstrap2 facetview and the facetview core -->
+  <script type="text/javascript" src="es.js"></script>
+  <script type="text/javascript" src="bootstrap2.facetview.theme.js"></script>
+  <script type="text/javascript" src="jquery.facetview2.js"></script>
+
+  <link rel="stylesheet" href="css/facetview.css">
+
+  <script type="text/javascript">
+	
+function customResultRenderer(options, record) {
+    return "string representation of record"
+}
+
+jQuery(document).ready(function($) {
+	$('.facet-view-simple').facetview({
+		search_url: 'http://kirishima.uib.no/elasticsearch/rdfdata/_search',
+		search_index: 'elasticsearch',
+		elasticsearch_facet_inflation : 100,
+		debug: true,
+        facets:    [
+	        	/**{'field': 'showweb', 'display': 'Publisert på web'},
+	        	{'field': 'isdigitized', 'display': 'Digitalisert'},
+	        	{'field': 'haszoom', 'display': 'DeepZoom'},
+	        	{'field': 'iscatalogued', 'display': 'Katalogisert'},
+	        	{'field': 'created', 'type': 'date_histogram', 'sort': 'desc', 'size': false, 'interval': 'day', 'short_display': '20', 'display': 'Dato', 'open': true, 'hide_empty_date_bin' : true },
+	        	{'field': 'madeafter', 'type': 'date_histogram', 'size': false, 'short_display': '20', 'display': 'Laget etter'},
+	        	**/
+
+                        {'field': 'madebefore', 'type': 'date_histogram', 'sort': 'desc', 'size': false, 'interval': 'day', 'short_display': '10', 'display': 'Dato', 'open': true, 'hide_empty_date_bin' : false },
+                        {'field': 'cataloguer.exact', 'size': 15, 'display': 'Katalogisert av'},
+                        {'field': 'madebefore', 'type': 'range',  "hide_empty_range" : false, "range" : [{"from" : '2000-01-01', "to" : '2015-01-01'}]},
+                        
+		    	{'field': 'type.exact', 'size': 70, 'display': 'Dokumenttype'},
+		    	{'field': 'storedat', 'size': 25, 'display': 'Lagret i'},
+		    	{'field': 'subject.exact', 'size': 25, 'display': 'Emne'},
+		    	{'field': 'ispartOof.exact', 'size': 25, 'display': 'Samling'},
+		    	{'field': 'maker.exact', 'size': 25, 'display': 'Laget av'}
+		    ],
+
+		//render_result_record: customResultRenderer,
+
+
+        result_display: [
+			[{
+				"pre": '<div class="col-md-8 col-xs-8"><h3 style="margin-top:7px;"><a href="',
+				"field": "url",
+				"post": '">'
+			},
+            {
+				"pre": "",
+				"field": "title",
+				"post": "</h3></a>"
+			},
+
+            {                  
+				"pre": "",
+				"field": "name",
+				"post": "</h3></a>"
+			},
+
+            {
+				"pre": "",
+				"field": "label",
+				"post": "</h3></a>"
+			}, {
+				"pre": "",
+				"field": "prefLabel",
+				"post": "</h3></a>"
+			}],
+			[{
+				"pre": '<p class="lead">',
+				"field": "description",
+				"post": "</p>"
+			}],
+			[{
+				"pre": '<br><span class="text-muted">Født: ',
+				"field": "birthDate",
+				'post': '</span>'
+			}, {
+				"pre": '<span class="text-muted"> - Død: ',
+				"field": "deathDate",
+				"post": '</span>'
+			}],
+			[{
+				"pre": "<br><b>Skapt av:</b> ",
+				"field": "maker",
+				"post": "<br>"
+			},
+			{
+				"pre": '<p class="bg-danger" style="padding: 5px;"><strong>Intern note</strong><br>',
+				"field": "internalNote",
+				"post": "</p>"
+			},
+
+                        {
+				"pre": "<br><b>Created:</b> ",
+				"field": "created",
+				"post": "<br>"
+			},
+                        
+                        {
+				"pre": "<br><b>Made before:</b> ",
+				"field": "madebefore",
+				"post": "<br>"
+			},
+                        
+                        {
+				"pre": "<br><b>Made after:</b> ",
+				"field": "madeafter",
+				"post": "<br>"
+			},
+                        
+                        
+                        ],
+			[{
+				"pre": "<br> <b>Relatert til:</b> ",
+				"field": "relation",
+				"post": "<br>"
+			}],
+			
+			[{
+				"pre": '<p><b>Teknikk:</b> ',
+				"field": "technique",
+				"post": '</p> '
+			}], 			
+			[{
+				"pre": '<br><span class="label label-success"><b>Publisert? </b> ',
+				"field": "showWeb",
+				"post": '</span> '
+			}], 
+			[{
+				"pre": ' <span class="label label-warning">',
+				"field": "isDigitized",
+				"post": '</span> '
+			}], 
+			[{
+				"pre": ' <span class="label label-info">',
+				"field": "hasZoom",
+				"post": '</span> '
+			}], 			
+			[{
+				"pre": ' <span class="label label-default">',
+				"field": "isCatalogued",
+				"post": '</span> '
+			}], 
+						
+			[{
+				"pre": '<br><span class="label label-info">',
+				"field": "type",
+				"post": '</span>'
+			}, 
+			{
+				"pre": '<br><span class="label label-warning">',
+				"field": 'type',
+				"post": '</span>'
+			}, 
+			{
+				"pre": ' <span class="label label-danger"><b>Signatur:</b> ',
+				"field": "identifier",
+				"post": '</span>'
+			},
+			{
+				"pre": '<div class="hidden">',
+				"field": "url",
+				"post": '</div></div>'
+			}],
+			[{
+				"pre": '<div class="col-md-4 col-xs-4"><a target="blank" href="',
+				"field": "url",
+				"post": '">'
+			}, {
+				"pre": '<img class="thumbnail img-responsive" style="margin-left: 15px; margin-bottom: 5px;" src="',
+				"field": "img",
+				"post": '">'
+			}],
+			[{
+				"pre": '<img class="thumbnail img-responsive" style="margin-left: 15px; margin-bottom: 5px;" src="',
+				"field": "hasthumbnail",
+				"post": "\">"
+			},
+			{
+				"pre": '<div class="hidden">',
+				"field": "url",
+				"post": '</div></div>'
+			}]
+		], 
+
+		default_operator: "AND",
+		default_freetext_fuzzify: "*",
+		permanent_filters: true,
+		pushstate: true,
+		datatype : "jsonp",
+		search_sortby: [{
+			"display": "Signatur",
+			"field": "http://purl.org/dc/terms/identifier"
+		}],
+		include_facets_in_querystring: false,
+		paging: {
+			size: 40
+		},
+		display_images: false,
+		searchwrap_start: '<div class="container-fluid" id="facetview_results">',
+		searchwrap_end: '</div>',
+		resultwrap_start: '<hr style="margin:10px -15px 10px -45px; border-top: 1px dashed #ccc; border-left: 1px dashed #ccc;"><div style="page-break-inside: avoid;" class="row" id="facetview_result">',
+		resultwrap_end: '</div>'
+	});
+});
+</script>
+
+<style type="text/css">
+.facet-view-simple{
+    width:1170px;
+    height:600px;
+    margin:20px auto 0 auto;
+}
+</style>
+
+</head>
+<body>
+         <form action="" method="post">
+            <input name="q" type="text">
+            <button type="submit">Sok</button>
+        </form>
+    <div class="facet-view-simple"></div>
+
+</body>
+</html>

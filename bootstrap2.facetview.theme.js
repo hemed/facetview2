@@ -293,7 +293,11 @@ function renderRangeFacet(facet, options) {
         </a> \
         </td></tr> \
         </table>';
-
+     
+     //Insert a date picker
+     var tmp = "<span> Date goes here </span>"
+     
+     
     // put the name of the field into FILTER_NAME and FILTER_EXACT
     filterTmpl = filterTmpl.replace(/{{FILTER_NAME}}/g, safeId(facet['field'])).replace(/{{FILTER_EXACT}}/g, facet['field']);
 
@@ -303,8 +307,8 @@ function renderRangeFacet(facet, options) {
     } else {
         filterTmpl = filterTmpl.replace(/{{FILTER_DISPLAY}}/g, facet['field']);
     };
-
-    return filterTmpl
+   return tmp;
+    //return filterTmpl
 }
 
 function renderGeoFacet(facet, options) {
@@ -363,7 +367,7 @@ function renderDateHistogramFacet(facet, options) {
         filterTmpl = filterTmpl.replace(/{{FILTER_DISPLAY}}/g, facet['field']);
     };
 
-    return filterTmpl
+    return filterTmpl;
 }
 
 function renderTermsFacetValues(options, facet) {
@@ -604,16 +608,23 @@ function renderDateHistogramValues(options, facet) {
 
     var selected_range = options.active_filters[facet.field];
     var frag = "";
-
+    //alert(selected_range);
     // render the active filter if there is one
     if (options.selected_filters_in_facet && selected_range) {
         var from = selected_range.from;
+        //var to = selected_range.to;
+        
         var data_from = " data-from='" + from + "' ";
+        /**var display = Number(from);
+        
+        var formatted_date = convertTimestampToDate(display);
+        **/
         var display = from;
+ 
         if (facet.value_function) {
             display = facet.value_function(display);
         }
-
+              
         var sf = '<tr class="facetview_filtervalue" style="display:none;"><td>';
         sf += "<strong>" + display + "</strong> ";
         sf += '<a class="facetview_filterselected facetview_clear" data-field="' + facet.field + '" '+ data_from + ' href="#"><i class="icon-black icon-remove" style="margin-top:1px;"></i></a>';
@@ -744,7 +755,7 @@ function renderDateHistogramResult(options, facet, result, next) {
 
     var display = result.time;
     if (facet.value_function) {
-        display = facet.value_function(display)
+        display = facet.value_function(display);
     }
 
     var append = '<tr class="facetview_filtervalue" style="display:none;"><td><a class="facetview_filterchoice' +
@@ -752,6 +763,40 @@ function renderDateHistogramResult(options, facet, result, next) {
                 '<span class="facetview_filterchoice_count" dir="ltr"> (' + result.count + ')</span></a></td></tr>';
     return append
 }
+
+function renderUBBDateHistogramResult(options, facet, result, next) {
+    var data_from = result.time ? " data-from='" + result.time + "' " : "";
+    var data_to = next ? " data-to='" + next.time + "' " : "";
+
+    var display = result.time;
+    var formatted_date = convertTimestampToDate(result.time) ;
+    
+    if (facet.value_function) {
+        display = facet.value_function(formatted_date);
+    }
+
+    var append = '<tr class="facetview_filtervalue" style="display:none;">\n\
+                      <td> <a class="facetview_filterchoice' +
+                          '" data-field="'+ facet['field']+ '" ' + data_to + data_from + ' href="#">\n\
+                                <span class="facetview_filterchoice_text" dir="auto">' + escapeHtml(display) + '</span>' +
+                                ' <span class="facetview_filterchoice_count" dir="ltr"> (' + result.count + ')</span></a>\n\
+                     </td>\n\
+                 </tr>';
+        
+    return append;
+}
+
+//Function to convert unix dates to readable format
+function convertTimestampToDate(unix_timestamp){
+    var d = new Date(unix_timestamp);
+    var year = d.getFullYear();
+    var month = (d.getMonth()+1) < 10 ? '0'+(d.getMonth()+1) : (d.getMonth()+1);
+    var date = d.getDate() < 10 ? '0' + d.getDate() : d.getDate();
+
+    var formatted_date = year + '-' + month + '-' + date ;
+
+    return formatted_date;
+ }
 
 function searchingNotification(options) {
     return "SEARCHING..."
@@ -885,9 +930,10 @@ function renderResultRecord(options, record) {
                 // work with a string hierarchy of dicts - it can't have lists in it
                 var parts = thekey.split('.');
                 var res = record;
+                 //alert(thekey);
                 for (var i = 0; i < parts.length; i++) {
                     if (res) {
-                        res = res[parts[i]]
+                        res = res[parts[i]];
                     } else {
                         continue
                     }
@@ -896,13 +942,15 @@ function renderResultRecord(options, record) {
                 // just get a string representation of the object
                 if (res) {
                     if ($.isArray(res)) {
-                        thevalue = res.join(", ")
+                        thevalue = res.join(", ");
+                         //thevalue = res.join(".");
                     } else {
                         thevalue = res.toString()
                     }
                 }
 
                 thevalue = escapeHtml(thevalue);
+               
             }
 
             // if we have a value to display, sort out the pre-and post- stuff and build the new line
