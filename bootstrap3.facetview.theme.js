@@ -921,6 +921,7 @@ function renderResultRecord(options, record) {
                 }
 
                 thevalue = escapeHtml(thevalue);
+                //alert(thevalue);
             }
 
             // if we have a value to display, sort out the pre-and post- stuff and build the new line

@@ -5,11 +5,11 @@
 // The reserved characters in elasticsearch query strings
 // Note that the "\" has to go first, as when these are substituted, that character
 // will get introduced as an escape character
-var esSpecialChars = ["\\", "+", "=", "&&", "||", ">", "<", "!", "(", ")", "{", "}", "[", "]", "^", '"', "~", "*", "?", ":", "/"];
+var esSpecialChars = ["\\", "+", "-", "=", "&&", "||", ">", "<", "!", "(", ")", "{", "}", "[", "]", "^", '"', "~", "*", "?", ":", "/"];
 
 // the reserved special character set with * and " removed, so that users can do quote searches and wildcards
 // if they want
-var esSpecialCharsSubSet = ["\\", "+", "=", "&&", "||", ">", "<", "!", "(", ")", "{", "}", "[", "]", "^", "~", "?", ":", "/"];
+var esSpecialCharsSubSet = ["\\", "+", "-", "=", "&&", "||", ">", "<", "!", "(", ")", "{", "}", "[", "]", "^", "~", "?", ":", "/"];
 
 // values that have to be in even numbers in the query or they will be escaped
 var esPairs = ['"'];
@@ -56,6 +56,7 @@ function optionsFromQuery(query) {
 
     // from position
     if (query.hasOwnProperty("from")) { opts["from"] = query.from }
+    
     // page size
     if (query.size) { opts["page_size"] = query.size }
     
@@ -124,8 +125,8 @@ function optionsFromQuery(query) {
                 if (field) {
                     var rparams = r[field];
                     var range = {};
-                    if ("lt" in rparams) { range["to"] = rparams.lt}
-                    if ("gte" in rparams) { range["from"] = rparams.gte}
+                    if ("lt" in rparams) { range["to"] = rparams.lt }
+                    if ("gte" in rparams) { range["from"] = rparams.gte }
                     opts["_active_filters"][field] = range;
                 }
             }
@@ -278,7 +279,7 @@ function elasticSearchQuery(params) {
 
     // search string and search field produce a query_string query element
     var querystring = options.q;
-    var searchfield = options.searchfield; 
+    var searchfield = options.searchfield;
     var default_operator = options.default_operator;
     var ftq = undefined;
     if (querystring) {
@@ -381,10 +382,9 @@ function elasticSearchQuery(params) {
 }
 
 function fuzzify(querystr, default_freetext_fuzzify) {
-    querystr = replacePlusSignWithSpace(querystr);
     var rqs = querystr;
     if (default_freetext_fuzzify !== undefined) {
-        if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
+        if (default_freetext_fuzzify == "*" || default_freetext_fuzzify == "~") {
             if (querystr.indexOf('*') === -1 && querystr.indexOf('~') === -1 && querystr.indexOf(':') === -1) {
                 var optparts = querystr.split(' ');
                 pq = "";
@@ -392,8 +392,7 @@ function fuzzify(querystr, default_freetext_fuzzify) {
                     var oip = optparts[oi];
                     if ( oip.length > 0 ) {
                         oip = oip + default_freetext_fuzzify;
-                        //default_freetext_fuzzify == "*" ? oip = "*" + oip : false;
-                        default_freetext_fuzzify === "*" ? oip : false;
+                        default_freetext_fuzzify == "*" ? oip = "*" + oip : false;
                         pq += oip + " ";
                     }
                 }
@@ -403,17 +402,6 @@ function fuzzify(querystr, default_freetext_fuzzify) {
     }
     return rqs;
 }
-
-  //Function to replace plus sign with empty string from a query string
-  //This may happen when a query is passed through a "q" variable from another page.
-  //And spaces are replaced by '+' sign. For example see Google queries on the browser.
-  function replacePlusSignWithSpace(text) 
-  {
-     if(text.indexOf('+'))
-      {
-        return text.split("+").join(" ");
-      }
-  };
 
 function jsonStringEscape(key, value) {
 
