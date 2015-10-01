@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html>
 <head>
@@ -113,3 +114,120 @@ jQuery(document).ready(function($) {
 
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>FacetView</title>
+
+  <script type="text/javascript" src="vendor/jquery/1.7.1/jquery-1.7.1.min.js"></script>
+
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <script type="text/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>  
+
+  <link rel="stylesheet" href="vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.css">
+  <script type="text/javascript" src="vendor/jquery-ui-1.8.18.custom/jquery-ui-1.8.18.custom.min.js"></script>
+
+  <!-- note that we require the es.js integration, the bootstrap2 facetview and the facetview core -->
+  <script type="text/javascript" src="es.js"></script>
+  <script type="text/javascript" src="bootstrap2.facetview.theme.js"></script>
+  <script type="text/javascript" src="jquery.facetview2.js"></script>
+
+  <link rel="stylesheet" href="css/facetview.css">
+
+  <script type="text/javascript">
+jQuery(document).ready(function($) {
+    $('.facet-view-simple').each(function() {
+        $(this).facetview({
+            search_url : 'http://kirishima.uib.no/elasticsearch/elasticsearch_index_skeivtark_default_node_index/_search',
+            datatype : "jsonp",
+            default_freetext_fuzzify: "*",
+            page_size: 15,
+            sort: [{"type.exact" : {"order" : "asc"}}],
+            searchfield: "type",
+            //q : "Money",
+            facets: [
+                 {'field': 'type.exact', 'display': 'Document Types', "logic" : "OR", "open" : true, "value_function" :  function(value) {return value.toUpperCase();}}
+                //{'field': 'title', 'display': 'Titles'}
+                /**{'field': 'http://data\.ub.uib.no/ontology/isDigitized', 'display': 'Digitalisert'},
+                {'field': 'http://data.ub.uib.no/ontology/hasZoom', 'display': 'DeepZoom'},
+                {'field': 'http://data.ub.uib.no/ontology/isCatalogued', 'display': 'Katalogisert'},
+                {'field': 'http://data.ub.uib.no/ontology/cataloguer.exact', 'size': 15, 'display': 'Katalogisert av'},
+                {'field': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type.exact', 'size': 70, 'display': 'Dokumenttype'},
+                {'field': 'http://data.ub.uib.no/ontology/storedAt', 'size': 25, 'display': 'Lagret i'},
+                {'field': 'http://purl.org/dc/terms/subject.exact', 'size': 25, 'display': 'Emne'},
+                {'field': 'http://purl.org/dc/terms/isPartOf.exact', 'size': 25, 'display': 'Samling'},
+                {'field': 'http://xmlns.com/foaf/0.1/maker.exact', 'size': 25, 'display': 'Laget av'}**/
+            ],
+            /**facets: [
+                {'field': 'price', 'display': 'Price', "type" : "range", "range" : [{"to" : 10, "display" : "less than £10"}, {"from" : 10, "to" : 20, "display" : "£10 - £20"}, {"from" : 20, "to" : 40, "display" : "£20 - £40"}, {"from" : 40, "display" : "£40+"}], "open" : true},
+                {'field' : 'loc', 'display' : 'Distance from me', 'type' : 'geo_distance', 
+                    'unit' : 'mi', 'open' : true, "lat" : 51.533182, "lon" : -0.475996, 
+                    "distance" : [
+                    {"to" : 0.5, "display" : "within 0.5 miles"}, {"to" : 2, "display" : "within 2 miles"}, {"to" : 5, "display" : "within 5 miles"},
+                    {"to" : 10, "display" : "within 10 miles"}, {"to" : 20, "display" : "within 20 miles"}, {"to" : 50, "display" : "within 50 miles"}
+                    ]
+                },
+                {'field': 'subject.exact', 'display': 'Subject', "logic" : "OR", "open" : true, "value_function" :  function(value) {return value.toUpperCase() } },
+                {'field': 'condition.exact', 'display': 'Condition', "logic" : "AND"},
+                {'field': 'year', 'display': 'Publication Year', "size" : 26},
+                {'field': 'edition.exact', 'display': 'Edition', "order" : "reverse_count", "open" : true},
+                {'field' : 'inactive', 'display' : 'Inactive Visible', 'deactivate_threshold' : 2},
+                {'field' : 'invisible', 'display' : 'Inactive Inisible', 'deactivate_threshold' : 2, 'hide_inactive' : true},
+            ],**/
+            default_facet_size: 11,
+            default_facet_operator: "AND",
+            default_facet_order: "term",
+            from: 0,
+            /**search_sortby: [
+                {'display':'Date added','field':'created_date'},
+                {'display':'Title','field':'title.exact'},
+                {'display':'Publication Year','field':'year'},
+                {'display':'Edition','field':'edition.exact'},
+                {'display':'Price','field':'price'}
+            ],
+            searchbox_fieldselect: [
+                {'display':'Title','field':'title'},
+                {'display':'ISBN','field':'isbn'},
+                {'display':'Authors','field':'authors'},
+                {'display':'Publisher','field':'publisher'}
+            ],**/
+            sharesave_link: true,
+            search_button: true,
+            debug: true,
+            fields: ["title", "field_teaser", "type"],
+            render_results_metadata: pageSlider,
+            "result_display" : [ 
+                [ {"pre" : "<h3>", "field": "title", "post" : "</h3>"} ],
+                [ {"pre" : "<i>", "field": "field_teaser", "post" : "</i>"} ],
+                [ {"pre" : "<strong>", "field": "type.exact", "post" : "</strong>"} ]
+            ],
+            selected_filters_in_facet: true,
+            show_filter_field : true,
+            show_filter_logic: true,
+            //predefined_filters : {
+            //    "subject.exact" : ["Medicine"]
+            //},
+            exclude_predefined_filters_from_facets : false
+        });
+    });
+});
+  </script>
+
+<style type="text/css">
+.facet-view-simple{
+    width:1170px;
+    height:600px;
+    margin:20px auto 0 auto;
+}
+</style>
+
+</head>
+<body>
+
+    <div class="facet-view-simple"></div>
+
+</body>
+</html>
+>>>>>>> 7c77e4ff13ddd8c9339eeac31dba4cad934b8ac3
